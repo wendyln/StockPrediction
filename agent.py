@@ -43,14 +43,12 @@ class DQNAgent:
 
         minibatch = random.sample(self.memory_buffer, batch_size)
 
-        ### BELOW is creating empty strucutre to fill with data later 
         states      = np.array([exp[0] for exp in minibatch])
         actions     = np.array([exp[1] for exp in minibatch])
         rewards     = np.array([exp[2] for exp in minibatch])
         next_states = np.array([exp[3] for exp in minibatch])
         done        = np.array([exp[4] for exp in minibatch])
 
-        ### dont worry too much about this, this is configuration related too 
         states_tensor      = torch.FloatTensor(states)
         next_states_tensor = torch.FloatTensor(next_states)
         actions_tensor     = torch.LongTensor(actions).unsqueeze(1)
@@ -64,15 +62,11 @@ class DQNAgent:
         with torch.no_grad():
             max_q_next = self.model(next_states_tensor).max(1)[0]
 
-        # Target
         targets = rewards_tensor + self.gamma * max_q_next
         targets[done_tensor] = rewards_tensor[done_tensor]
 
-        #### BELOW NO NEED WORRY -- FIX STRUCTURED CODE 
-        # Loss
         loss = self.criterion(q_values, targets)
 
-        # Optimize
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
